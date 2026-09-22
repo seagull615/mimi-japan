@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기초 일본어 명사 100</title>
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --ipa-size: 16px;
+    --ipa-color: #888;
+  }
+
+  body {
+    margin: 0;
+    padding: 28px 16px 40px;
+    background: #f7f5f0;
+    color: #222;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  header {
+    max-width: 900px;
+    margin: 0 auto 22px;
+    text-align: center;
+  }
+
+  header h1 {
+    font-size: 22px;
+    margin: 0 0 6px;
+  }
+
+  header p {
+    margin: 0 0 14px;
+    color: #888;
+    font-size: 14px;
+  }
+
+  .refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: #222;
+    color: #fff;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .refresh-btn:hover {
+    background: #444;
+  }
+
+  #cardsNoms {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 6px 6px 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #cardsNoms::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  #cardsNoms::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 999px;
+  }
+
+  .card {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: min(88vw, 560px);
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  .part-of-speech {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: #eee;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  .pos-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .word-line {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    column-gap: 12px;
+    row-gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .word-detail {
+    font-size: 32px;
+    font-weight: 700;
+    word-break: keep-all;
+  }
+
+  .reading {
+    font-size: 16px;
+    color: #999;
+  }
+
+  .phonetics {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 16px;
+  }
+
+  .phon-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: var(--ipa-size);
+    color: var(--ipa-color);
+  }
+
+  .phon-tag {
+    font-size: 11px;
+    color: #bbb;
+    min-width: 34px;
+  }
+
+  .phon-jamo {
+    letter-spacing: 1px;
+    color: #777;
+    font-weight: 500;
+  }
+
+  .speak-btn {
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 999px;
+    font-size: 13px;
+    padding: 7px 16px;
+    cursor: pointer;
+    margin-bottom: 18px;
+  }
+
+  .speak-btn:hover {
+    background: #f5f5f5;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .info-label {
+    display: block;
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 8px;
+  }
+
+  .meaning {
+    font-size: 19px;
+    margin: 0;
+  }
+
+  .example {
+    border-left: 4px solid #222;
+    padding: 10px 16px;
+    margin: 16px 0 0;
+    background: #fafafa;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .example .jp {
+    font-size: 17px;
+    margin-bottom: 5px;
+  }
+
+  .example .korean {
+    color: #666;
+    font-size: 15px;
+  }
+
+  footer {
+    max-width: 900px;
+    margin: 20px auto 0;
+    text-align: center;
+    color: #bbb;
+    font-size: 12px;
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 22px 18px; border-radius: 16px; }
+    .word-detail { font-size: 27px; }
+    :root { --ipa-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>기초 일본어 명사 100 (基礎名詞)</h1>
+  <p>옆으로 스크롤하며 명사를 확인하세요 · 총 100개 명사 중 무작위 10개</p>
+  <button type="button" id="refreshBtnNoms" class="refresh-btn">🔄 새 명사 보기</button>
+</header>
+
+<div id="cardsNoms"></div>
+
+<footer>새로고침을 누르면 무작위로 새로운 10개 명사가 나타납니다 · 한글 발음기호는 자모를 풀어쓴 근사 표기입니다</footer>
+
+<script>
+  const DATABASE_NOMS = [{"word": "家族", "reading": "かぞく", "meaning": "가족", "ipa": "kazokɯ", "hipa": "ㅋㅏㅈㅗㅋㅜ", "pos": "noun", "ex": "私の家族は四人です。", "exko": "우리 가족은 네 명이다."}, {"word": "父", "reading": "ちち", "meaning": "아버지", "ipa": "tɕitɕi", "hipa": "ㅊㅣㅊㅣ", "pos": "noun", "ex": "父は毎朝新聞を読みます。", "exko": "아버지는 매일 아침 신문을 읽으신다."}, {"word": "母", "reading": "はは", "meaning": "어머니", "ipa": "haha", "hipa": "ㅎㅏㅎㅏ", "pos": "noun", "ex": "母は料理が上手です。", "exko": "어머니는 요리를 잘하신다."}, {"word": "兄", "reading": "あに", "meaning": "형(오빠)", "ipa": "ani", "hipa": "ㅏㄴㅣ", "pos": "noun", "ex": "兄は大学生です。", "exko": "형(오빠)은 대학생이다."}, {"word": "姉", "reading": "あね", "meaning": "누나(언니)", "ipa": "ane", "hipa": "ㅏㄴㅔ", "pos": "noun", "ex": "姉は看護師です。", "exko": "누나(언니)는 간호사다."}, {"word": "弟", "reading": "おとうと", "meaning": "남동생", "ipa": "otoɯto", "hipa": "ㅗㅌㅗㅜㅌㅗ", "pos": "noun", "ex": "弟はまだ小学生です。", "exko": "남동생은 아직 초등학생이다."}, {"word": "妹", "reading": "いもうと", "meaning": "여동생", "ipa": "imoɯto", "hipa": "ㅣㅁㅗㅜㅌㅗ", "pos": "noun", "ex": "妹は毎日ピアノを練習します。", "exko": "여동생은 매일 피아노를 연습한다."}, {"word": "祖父", "reading": "そふ", "meaning": "할아버지", "ipa": "soɸɯ", "hipa": "ㅅㅗㅍㅜ", "pos": "noun", "ex": "祖父は庭で花を育てています。", "exko": "할아버지는 정원에서 꽃을 기르신다."}, {"word": "祖母", "reading": "そぼ", "meaning": "할머니", "ipa": "sobo", "hipa": "ㅅㅗㅂㅗ", "pos": "noun", "ex": "祖母は毎週手紙をくれます。", "exko": "할머니는 매주 편지를 보내주신다."}, {"word": "息子", "reading": "むすこ", "meaning": "아들", "ipa": "mɯsɯko", "hipa": "ㅁㅜㅅㅜㅋㅗ", "pos": "noun", "ex": "息子は来年高校に入ります。", "exko": "아들은 내년에 고등학교에 들어간다."}, {"word": "娘", "reading": "むすめ", "meaning": "딸", "ipa": "mɯsɯme", "hipa": "ㅁㅜㅅㅜㅁㅔ", "pos": "noun", "ex": "娘は絵を描くのが好きです。", "exko": "딸은 그림 그리는 것을 좋아한다."}, {"word": "友達", "reading": "ともだち", "meaning": "친구", "ipa": "tomodatɕi", "hipa": "ㅌㅗㅁㅗㄷㅏㅊㅣ", "pos": "noun", "ex": "友達と映画を見に行きました。", "exko": "친구와 영화를 보러 갔다."}, {"word": "先生", "reading": "せんせい", "meaning": "선생님", "ipa": "seɴsei", "hipa": "ㅅㅔㄴㅅㅔㅣ", "pos": "noun", "ex": "先生はとても親切です。", "exko": "선생님은 매우 친절하시다."}, {"word": "学生", "reading": "がくせい", "meaning": "학생", "ipa": "gakɯsei", "hipa": "ㄱㅏㅋㅜㅅㅔㅣ", "pos": "noun", "ex": "学生は毎日図書館で勉強します。", "exko": "학생은 매일 도서관에서 공부한다."}, {"word": "犬", "reading": "いぬ", "meaning": "개", "ipa": "inɯ", "hipa": "ㅣㄴㅜ", "pos": "noun", "ex": "犬が公園を走っています。", "exko": "개가 공원을 뛰어다니고 있다."}, {"word": "猫", "reading": "ねこ", "meaning": "고양이", "ipa": "neko", "hipa": "ㄴㅔㅋㅗ", "pos": "noun", "ex": "猫は窓の近くで寝ています。", "exko": "고양이는 창가에서 자고 있다."}, {"word": "鳥", "reading": "とり", "meaning": "새", "ipa": "toɾi", "hipa": "ㅌㅗㄹㅣ", "pos": "noun", "ex": "鳥が木の上で鳴いています。", "exko": "새가 나무 위에서 울고 있다."}, {"word": "魚", "reading": "さかな", "meaning": "물고기", "ipa": "sakana", "hipa": "ㅅㅏㅋㅏㄴㅏ", "pos": "noun", "ex": "川で魚を釣りました。", "exko": "강에서 물고기를 낚았다."}, {"word": "馬", "reading": "うま", "meaning": "말", "ipa": "ɯma", "hipa": "ㅜㅁㅏ", "pos": "noun", "ex": "馬が牧場を走っています。", "exko": "말이 목장을 달리고 있다."}, {"word": "牛", "reading": "うし", "meaning": "소", "ipa": "ɯɕi", "hipa": "ㅜㅅㅣ", "pos": "noun", "ex": "牛が草を食べています。", "exko": "소가 풀을 먹고 있다."}, {"word": "豚", "reading": "ぶた", "meaning": "돼지", "ipa": "bɯta", "hipa": "ㅂㅜㅌㅏ", "pos": "noun", "ex": "農場に豚がたくさんいます。", "exko": "농장에 돼지가 많이 있다."}, {"word": "うさぎ", "reading": "うさぎ", "meaning": "토끼", "ipa": "ɯsagi", "hipa": "ㅜㅅㅏㄱㅣ", "pos": "noun", "ex": "うさぎは耳が長いです。", "exko": "토끼는 귀가 길다."}, {"word": "ねずみ", "reading": "ねずみ", "meaning": "쥐", "ipa": "nezɯmi", "hipa": "ㄴㅔㅈㅜㅁㅣ", "pos": "noun", "ex": "台所にねずみが出ました。", "exko": "부엌에 쥐가 나타났다."}, {"word": "空", "reading": "そら", "meaning": "하늘", "ipa": "soɾa", "hipa": "ㅅㅗㄹㅏ", "pos": "noun", "ex": "空はとても青いです。", "exko": "하늘이 매우 파랗다."}, {"word": "雲", "reading": "くも", "meaning": "구름", "ipa": "kɯmo", "hipa": "ㅋㅜㅁㅗ", "pos": "noun", "ex": "白い雲が浮かんでいます。", "exko": "하얀 구름이 떠 있다."}, {"word": "雨", "reading": "あめ", "meaning": "비", "ipa": "ame", "hipa": "ㅏㅁㅔ", "pos": "noun", "ex": "明日は雨が降るでしょう。", "exko": "내일은 비가 올 것이다."}, {"word": "雪", "reading": "ゆき", "meaning": "눈(雪)", "ipa": "jɯki", "hipa": "ㅠㅋㅣ", "pos": "noun", "ex": "冬になると雪が降ります。", "exko": "겨울이 되면 눈이 내린다."}, {"word": "風", "reading": "かぜ", "meaning": "바람", "ipa": "kaze", "hipa": "ㅋㅏㅈㅔ", "pos": "noun", "ex": "今日は風が強いです。", "exko": "오늘은 바람이 강하다."}, {"word": "太陽", "reading": "たいよう", "meaning": "태양", "ipa": "taijoɯ", "hipa": "ㅌㅏㅣㅛㅜ", "pos": "noun", "ex": "太陽が東から昇ります。", "exko": "태양은 동쪽에서 뜬다."}, {"word": "月", "reading": "つき", "meaning": "달", "ipa": "tsɯki", "hipa": "ㅊㅜㅋㅣ", "pos": "noun", "ex": "夜空に丸い月が見えます。", "exko": "밤하늘에 둥근 달이 보인다."}, {"word": "星", "reading": "ほし", "meaning": "별", "ipa": "hoɕi", "hipa": "ㅎㅗㅅㅣ", "pos": "noun", "ex": "山の上で星がよく見えます。", "exko": "산 위에서는 별이 잘 보인다."}, {"word": "山", "reading": "やま", "meaning": "산", "ipa": "jama", "hipa": "ㅑㅁㅏ", "pos": "noun", "ex": "週末に山に登ります。", "exko": "주말에 산에 오른다."}, {"word": "川", "reading": "かわ", "meaning": "강", "ipa": "kawa", "hipa": "ㅋㅏㅘ", "pos": "noun", "ex": "子供たちが川で遊んでいます。", "exko": "아이들이 강에서 놀고 있다."}, {"word": "海", "reading": "うみ", "meaning": "바다", "ipa": "ɯmi", "hipa": "ㅜㅁㅣ", "pos": "noun", "ex": "夏には海に行きたいです。", "exko": "여름에는 바다에 가고 싶다."}, {"word": "木", "reading": "き", "meaning": "나무", "ipa": "ki", "hipa": "ㅋㅣ", "pos": "noun", "ex": "庭に大きな木があります。", "exko": "정원에 큰 나무가 있다."}, {"word": "花", "reading": "はな", "meaning": "꽃", "ipa": "hana", "hipa": "ㅎㅏㄴㅏ", "pos": "noun", "ex": "公園にきれいな花が咲いています。", "exko": "공원에 예쁜 꽃이 피어 있다."}, {"word": "水", "reading": "みず", "meaning": "물", "ipa": "mizɯ", "hipa": "ㅁㅣㅈㅜ", "pos": "noun", "ex": "喉が渇いたので水を飲みました。", "exko": "목이 말라서 물을 마셨다."}, {"word": "火", "reading": "ひ", "meaning": "불", "ipa": "çi", "hipa": "ㅎㅣ", "pos": "noun", "ex": "キャンプで火をおこしました。", "exko": "캠핑에서 불을 피웠다."}, {"word": "土", "reading": "つち", "meaning": "흙", "ipa": "tsɯtɕi", "hipa": "ㅊㅜㅊㅣ", "pos": "noun", "ex": "雨の後、土が柔らかくなりました。", "exko": "비가 온 후 흙이 부드러워졌다."}, {"word": "家", "reading": "いえ", "meaning": "집", "ipa": "ie", "hipa": "ㅣㅔ", "pos": "noun", "ex": "新しい家に引っ越しました。", "exko": "새 집으로 이사했다."}, {"word": "部屋", "reading": "へや", "meaning": "방", "ipa": "heja", "hipa": "ㅎㅔㅑ", "pos": "noun", "ex": "私の部屋は二階にあります。", "exko": "내 방은 2층에 있다."}, {"word": "窓", "reading": "まど", "meaning": "창문", "ipa": "mado", "hipa": "ㅁㅏㄷㅗ", "pos": "noun", "ex": "窓を開けて空気を入れました。", "exko": "창문을 열어 공기를 넣었다."}, {"word": "机", "reading": "つくえ", "meaning": "책상", "ipa": "tsɯkɯe", "hipa": "ㅊㅜㅋㅜㅔ", "pos": "noun", "ex": "机の上に本があります。", "exko": "책상 위에 책이 있다."}, {"word": "椅子", "reading": "いす", "meaning": "의자", "ipa": "isɯ", "hipa": "ㅣㅅㅜ", "pos": "noun", "ex": "椅子に座って休みました。", "exko": "의자에 앉아 쉬었다."}, {"word": "台所", "reading": "だいどころ", "meaning": "부엌", "ipa": "daidokoɾo", "hipa": "ㄷㅏㅣㄷㅗㅋㅗㄹㅗ", "pos": "noun", "ex": "母は台所で料理をしています。", "exko": "어머니는 부엌에서 요리를 하고 계신다."}, {"word": "風呂", "reading": "ふろ", "meaning": "욕실(목욕)", "ipa": "ɸɯɾo", "hipa": "ㅍㅜㄹㅗ", "pos": "noun", "ex": "寝る前にお風呂に入ります。", "exko": "자기 전에 목욕을 한다."}, {"word": "庭", "reading": "にわ", "meaning": "정원", "ipa": "niwa", "hipa": "ㄴㅣㅘ", "pos": "noun", "ex": "庭で野菜を育てています。", "exko": "정원에서 채소를 기르고 있다."}, {"word": "鍵", "reading": "かぎ", "meaning": "열쇠", "ipa": "kagi", "hipa": "ㅋㅏㄱㅣ", "pos": "noun", "ex": "鍵をなくしてしまいました。", "exko": "열쇠를 잃어버리고 말았다."}, {"word": "時計", "reading": "とけい", "meaning": "시계", "ipa": "tokei", "hipa": "ㅌㅗㅋㅔㅣ", "pos": "noun", "ex": "壁に大きな時計があります。", "exko": "벽에 큰 시계가 있다."}, {"word": "本", "reading": "ほん", "meaning": "책", "ipa": "hoɴ", "hipa": "ㅎㅗㄴ", "pos": "noun", "ex": "図書館で本を借りました。", "exko": "도서관에서 책을 빌렸다."}, {"word": "鉛筆", "reading": "えんぴつ", "meaning": "연필", "ipa": "eɴpitsɯ", "hipa": "ㅔㄴㅍㅣㅊㅜ", "pos": "noun", "ex": "鉛筆で名前を書きました。", "exko": "연필로 이름을 썼다."}, {"word": "かばん", "reading": "かばん", "meaning": "가방", "ipa": "kabaɴ", "hipa": "ㅋㅏㅂㅏㄴ", "pos": "noun", "ex": "かばんの中に財布があります。", "exko": "가방 안에 지갑이 있다."}, {"word": "紙", "reading": "かみ", "meaning": "종이", "ipa": "kami", "hipa": "ㅋㅏㅁㅣ", "pos": "noun", "ex": "白い紙に絵を描きました。", "exko": "하얀 종이에 그림을 그렸다."}, {"word": "傘", "reading": "かさ", "meaning": "우산", "ipa": "kasa", "hipa": "ㅋㅏㅅㅏ", "pos": "noun", "ex": "雨が降っているので傘を持って行きます。", "exko": "비가 오고 있어서 우산을 가지고 간다."}, {"word": "財布", "reading": "さいふ", "meaning": "지갑", "ipa": "saiɸɯ", "hipa": "ㅅㅏㅣㅍㅜ", "pos": "noun", "ex": "財布に千円あります。", "exko": "지갑에 천 엔이 있다."}, {"word": "眼鏡", "reading": "めがね", "meaning": "안경", "ipa": "megane", "hipa": "ㅁㅔㄱㅏㄴㅔ", "pos": "noun", "ex": "眼鏡をかけて本を読みます。", "exko": "안경을 쓰고 책을 읽는다."}, {"word": "靴", "reading": "くつ", "meaning": "신발", "ipa": "kɯtsɯ", "hipa": "ㅋㅜㅊㅜ", "pos": "noun", "ex": "新しい靴を買いました。", "exko": "새 신발을 샀다."}, {"word": "服", "reading": "ふく", "meaning": "옷", "ipa": "ɸɯkɯ", "hipa": "ㅍㅜㅋㅜ", "pos": "noun", "ex": "今日は暖かい服を着ました。", "exko": "오늘은 따뜻한 옷을 입었다."}, {"word": "帽子", "reading": "ぼうし", "meaning": "모자", "ipa": "boɯɕi", "hipa": "ㅂㅗㅜㅅㅣ", "pos": "noun", "ex": "日差しが強いので帽子をかぶります。", "exko": "햇볕이 강해서 모자를 쓴다."}, {"word": "ご飯", "reading": "ごはん", "meaning": "밥(식사)", "ipa": "gohaɴ", "hipa": "ㄱㅗㅎㅏㄴ", "pos": "noun", "ex": "朝ご飯を食べました。", "exko": "아침밥을 먹었다."}, {"word": "パン", "reading": "パン", "meaning": "빵", "ipa": "paɴ", "hipa": "ㅍㅏㄴ", "pos": "noun", "ex": "パンとコーヒーを食べました。", "exko": "빵과 커피를 먹었다."}, {"word": "茶", "reading": "ちゃ", "meaning": "차(음료)", "ipa": "tɕa", "hipa": "ㅊㅑ", "pos": "noun", "ex": "食後にお茶を飲みます。", "exko": "식후에 차를 마신다."}, {"word": "肉", "reading": "にく", "meaning": "고기", "ipa": "nikɯ", "hipa": "ㄴㅣㅋㅜ", "pos": "noun", "ex": "夕食に肉を焼きました。", "exko": "저녁 식사로 고기를 구웠다."}, {"word": "野菜", "reading": "やさい", "meaning": "채소", "ipa": "jasai", "hipa": "ㅑㅅㅏㅣ", "pos": "noun", "ex": "野菜をたくさん食べてください。", "exko": "채소를 많이 드세요."}, {"word": "果物", "reading": "くだもの", "meaning": "과일", "ipa": "kɯdamono", "hipa": "ㅋㅜㄷㅏㅁㅗㄴㅗ", "pos": "noun", "ex": "毎朝果物を食べます。", "exko": "매일 아침 과일을 먹는다."}, {"word": "卵", "reading": "たまご", "meaning": "계란", "ipa": "tamago", "hipa": "ㅌㅏㅁㅏㄱㅗ", "pos": "noun", "ex": "卵を二個買いました。", "exko": "계란을 두 개 샀다."}, {"word": "牛乳", "reading": "ぎゅうにゅう", "meaning": "우유", "ipa": "gɯɯnɯɯ", "hipa": "ㄱㅠㅜㄴㅠㅜ", "pos": "noun", "ex": "朝、牛乳を飲みます。", "exko": "아침에 우유를 마신다."}, {"word": "砂糖", "reading": "さとう", "meaning": "설탕", "ipa": "satoɯ", "hipa": "ㅅㅏㅌㅗㅜ", "pos": "noun", "ex": "コーヒーに砂糖を入れます。", "exko": "커피에 설탕을 넣는다."}, {"word": "塩", "reading": "しお", "meaning": "소금", "ipa": "ɕio", "hipa": "ㅅㅣㅗ", "pos": "noun", "ex": "スープに塩を少し入れました。", "exko": "수프에 소금을 조금 넣었다."}, {"word": "今日", "reading": "きょう", "meaning": "오늘", "ipa": "koɯ", "hipa": "ㅋㅛㅜ", "pos": "noun", "ex": "今日は天気がいいです。", "exko": "오늘은 날씨가 좋다."}, {"word": "明日", "reading": "あした", "meaning": "내일", "ipa": "aɕita", "hipa": "ㅏㅅㅣㅌㅏ", "pos": "noun", "ex": "明日、友達に会います。", "exko": "내일 친구를 만난다."}, {"word": "昨日", "reading": "きのう", "meaning": "어제", "ipa": "kinoɯ", "hipa": "ㅋㅣㄴㅗㅜ", "pos": "noun", "ex": "昨日は雨でした。", "exko": "어제는 비가 왔다."}, {"word": "朝", "reading": "あさ", "meaning": "아침", "ipa": "asa", "hipa": "ㅏㅅㅏ", "pos": "noun", "ex": "毎朝六時に起きます。", "exko": "매일 아침 6시에 일어난다."}, {"word": "昼", "reading": "ひる", "meaning": "낮(점심)", "ipa": "çiɾɯ", "hipa": "ㅎㅣㄹㅜ", "pos": "noun", "ex": "お昼にラーメンを食べました。", "exko": "점심에 라멘을 먹었다."}, {"word": "夜", "reading": "よる", "meaning": "밤", "ipa": "joɾɯ", "hipa": "ㅛㄹㅜ", "pos": "noun", "ex": "夜は静かに本を読みます。", "exko": "밤에는 조용히 책을 읽는다."}, {"word": "時間", "reading": "じかん", "meaning": "시간", "ipa": "dʑikaɴ", "hipa": "ㅈㅣㅋㅏㄴ", "pos": "noun", "ex": "時間がないので急ぎます。", "exko": "시간이 없어서 서두른다."}, {"word": "年", "reading": "とし", "meaning": "나이(해)", "ipa": "toɕi", "hipa": "ㅌㅗㅅㅣ", "pos": "noun", "ex": "来年、日本に行きます。", "exko": "내년에 일본에 간다."}, {"word": "頭", "reading": "あたま", "meaning": "머리", "ipa": "atama", "hipa": "ㅏㅌㅏㅁㅏ", "pos": "noun", "ex": "頭が少し痛いです。", "exko": "머리가 조금 아프다."}, {"word": "顔", "reading": "かお", "meaning": "얼굴", "ipa": "kao", "hipa": "ㅋㅏㅗ", "pos": "noun", "ex": "朝、顔を洗います。", "exko": "아침에 얼굴을 씻는다."}, {"word": "目", "reading": "め", "meaning": "눈(目)", "ipa": "me", "hipa": "ㅁㅔ", "pos": "noun", "ex": "目が疲れています。", "exko": "눈이 피곤하다."}, {"word": "耳", "reading": "みみ", "meaning": "귀", "ipa": "mimi", "hipa": "ㅁㅣㅁㅣ", "pos": "noun", "ex": "うさぎの耳は長いです。", "exko": "토끼의 귀는 길다."}, {"word": "口", "reading": "くち", "meaning": "입", "ipa": "kɯtɕi", "hipa": "ㅋㅜㅊㅣ", "pos": "noun", "ex": "口を大きく開けてください。", "exko": "입을 크게 벌려 주세요."}, {"word": "手", "reading": "て", "meaning": "손", "ipa": "te", "hipa": "ㅌㅔ", "pos": "noun", "ex": "食事の前に手を洗います。", "exko": "식사 전에 손을 씻는다."}, {"word": "足", "reading": "あし", "meaning": "다리(발)", "ipa": "aɕi", "hipa": "ㅏㅅㅣ", "pos": "noun", "ex": "長く歩いたので足が痛いです。", "exko": "오래 걸어서 다리가 아프다."}, {"word": "体", "reading": "からだ", "meaning": "몸", "ipa": "kaɾada", "hipa": "ㅋㅏㄹㅏㄷㅏ", "pos": "noun", "ex": "運動して体を鍛えます。", "exko": "운동해서 몸을 단련한다."}, {"word": "学校", "reading": "がっこう", "meaning": "학교", "ipa": "gakkoɯ", "hipa": "ㄱㅏㅅㅋㅗㅜ", "pos": "noun", "ex": "毎日学校へ行きます。", "exko": "매일 학교에 간다."}, {"word": "会社", "reading": "かいしゃ", "meaning": "회사", "ipa": "kaiɕa", "hipa": "ㅋㅏㅣㅅㅑ", "pos": "noun", "ex": "父は会社で働いています。", "exko": "아버지는 회사에서 일하신다."}, {"word": "病院", "reading": "びょういん", "meaning": "병원", "ipa": "boɯiɴ", "hipa": "ㅂㅛㅜㅣㄴ", "pos": "noun", "ex": "昨日、病院に行きました。", "exko": "어제 병원에 갔다."}, {"word": "駅", "reading": "えき", "meaning": "역", "ipa": "eki", "hipa": "ㅔㅋㅣ", "pos": "noun", "ex": "駅で友達を待ちます。", "exko": "역에서 친구를 기다린다."}, {"word": "店", "reading": "みせ", "meaning": "가게", "ipa": "mise", "hipa": "ㅁㅣㅅㅔ", "pos": "noun", "ex": "新しい店ができました。", "exko": "새 가게가 생겼다."}, {"word": "公園", "reading": "こうえん", "meaning": "공원", "ipa": "koɯeɴ", "hipa": "ㅋㅗㅜㅔㄴ", "pos": "noun", "ex": "公園で子供たちが遊んでいます。", "exko": "공원에서 아이들이 놀고 있다."}, {"word": "町", "reading": "まち", "meaning": "마을(동네)", "ipa": "matɕi", "hipa": "ㅁㅏㅊㅣ", "pos": "noun", "ex": "静かな町に住んでいます。", "exko": "조용한 동네에 살고 있다."}, {"word": "国", "reading": "くに", "meaning": "나라", "ipa": "kɯni", "hipa": "ㅋㅜㄴㅣ", "pos": "noun", "ex": "日本は美しい国です。", "exko": "일본은 아름다운 나라다."}, {"word": "車", "reading": "くるま", "meaning": "자동차", "ipa": "kɯɾɯma", "hipa": "ㅋㅜㄹㅜㅁㅏ", "pos": "noun", "ex": "車で会社に行きます。", "exko": "자동차로 회사에 간다."}, {"word": "電車", "reading": "でんしゃ", "meaning": "전철", "ipa": "deɴɕa", "hipa": "ㄷㅔㄴㅅㅑ", "pos": "noun", "ex": "電車で学校に通っています。", "exko": "전철로 학교에 다니고 있다."}, {"word": "自転車", "reading": "じてんしゃ", "meaning": "자전거", "ipa": "dʑiteɴɕa", "hipa": "ㅈㅣㅌㅔㄴㅅㅑ", "pos": "noun", "ex": "自転車で駅まで行きます。", "exko": "자전거로 역까지 간다."}, {"word": "飛行機", "reading": "ひこうき", "meaning": "비행기", "ipa": "çikoɯki", "hipa": "ㅎㅣㅋㅗㅜㅋㅣ", "pos": "noun", "ex": "飛行機で日本に行きます。", "exko": "비행기로 일본에 간다."}, {"word": "お金", "reading": "おかね", "meaning": "돈", "ipa": "okane", "hipa": "ㅗㅋㅏㄴㅔ", "pos": "noun", "ex": "お金をあまり持っていません。", "exko": "돈을 별로 가지고 있지 않다."}, {"word": "仕事", "reading": "しごと", "meaning": "일(업무)", "ipa": "ɕigoto", "hipa": "ㅅㅣㄱㅗㅌㅗ", "pos": "noun", "ex": "仕事が忙しいです。", "exko": "일이 바쁘다."}, {"word": "名前", "reading": "なまえ", "meaning": "이름", "ipa": "namae", "hipa": "ㄴㅏㅁㅏㅔ", "pos": "noun", "ex": "名前を教えてください。", "exko": "이름을 알려주세요."}];
+  const WORDS_PER_SET_NOMS = 10;
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function getRandomWords(n, database) {
+    const indices = shuffle([...Array(database.length).keys()]);
+    return indices.slice(0, n).map(i => database[i]);
+  }
+
+  function speak(reading) {
+    if (!('speechSynthesis' in window)) return;
+    const utter = new SpeechSynthesisUtterance(reading);
+    utter.lang = 'ja-JP';
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  }
+
+  function buildCard(entry) {
+    const card = document.createElement('main');
+    card.className = 'card';
+
+    card.innerHTML = `
+      <div class="pos-row">
+        <div class="part-of-speech">명사 · 名詞</div>
+      </div>
+      <div class="word-line">
+        <span class="word-detail">${entry.word}</span>
+        <span class="reading">(${entry.reading})</span>
+      </div>
+      <div class="phonetics">
+        <div class="phon-row"><span class="phon-tag">IPA</span><span>/${entry.ipa}/</span></div>
+        <div class="phon-row"><span class="phon-tag">한글</span><span class="phon-jamo">${entry.hipa}</span></div>
+      </div>
+      <button type="button" class="speak-btn">🔊 발음 듣기</button>
+
+      <div class="content-grid">
+        <div>
+          <span class="info-label">뜻</span>
+          <p class="meaning">${entry.meaning}</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <div class="jp">${entry.ex}</div>
+        <div class="korean">${entry.exko}</div>
+      </div>
+    `;
+
+    card.querySelector('.speak-btn').addEventListener('click', () => speak(entry.reading));
+
+    return card;
+  }
+
+  function render(containerId, database, n) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    getRandomWords(n, database).forEach(entry => container.appendChild(buildCard(entry)));
+    container.scrollTo({ left: 0 });
+  }
+
+  document.getElementById('refreshBtnNoms').addEventListener('click', () => render('cardsNoms', DATABASE_NOMS, WORDS_PER_SET_NOMS));
+
+  render('cardsNoms', DATABASE_NOMS, WORDS_PER_SET_NOMS);
+</script>
+
+</body>
+</html>
